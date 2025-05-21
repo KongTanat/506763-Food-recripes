@@ -1,0 +1,213 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* จัดชิดด้านบนเพื่อให้มีพื้นที่สำหรับ Scroll */
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 30px 40px; /* เพิ่ม padding ด้านข้าง */
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 700px; /* เพิ่มความกว้างสูงสุดสำหรับฟอร์มที่มีหลาย field */
+    margin: 40px auto; /* เพิ่ม margin ด้านบนและล่าง และจัดกึ่งกลาง */
+    box-sizing: border-box;
+}
+
+.header {
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 2.2em; /* ขนาดตัวอักษรใหญ่ขึ้น */
+    font-weight: 700; /* น้ำหนักตัวอักษรมากขึ้น */
+    text-align: center;
+}
+
+.form-input {
+    margin-bottom: 20px;
+}
+
+.header-form {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* เพิ่มช่องว่างระหว่าง items ใน flexbox */
+}
+
+.flex.form-input {
+    flex-direction: column; /* จัดวางเป็นแนวตั้งสำหรับแต่ละกลุ่ม input */
+    align-items: flex-start; /* ชิดซ้าย */
+}
+
+.form {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    outline: none;
+}
+
+textarea.form {
+    min-height: 120px; /* กำหนดความสูงขั้นต่ำสำหรับ textarea */
+    resize: vertical; /* อนุญาตให้ปรับขนาดแนวตั้งเท่านั้น */
+}
+
+.radio-group {
+    display: flex;
+    flex-wrap: wrap; /* ให้ radio buttons ขึ้นบรรทัดใหม่ได้ถ้าพื้นที่ไม่พอ */
+    gap: 20px; /* ช่องว่างระหว่าง radio button groups */
+}
+
+.radio-group div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.radio-group input[type="radio"] {
+    appearance: none; /* ซ่อน radio button default */
+    width: 18px;
+    height: 18px;
+    border: 2px solid #bbb;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    flex-shrink: 0; /* ป้องกันไม่ให้ radio button หดตัว */
+}
+
+.radio-group input[type="radio"]:checked {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+    box-shadow: inset 0 0 0 5px #fff; /* จุดวงกลมสีขาวตรงกลาง */
+}
+
+.radio-group label {
+    cursor: pointer;
+    font-size: 1em;
+    color: #333;
+    margin-bottom: 0; /* ลบ margin-bottom จาก label ทั่วไป */
+}
+
+
+/* ปุ่ม */
+.button-group {
+    display: flex;
+    justify-content: center; /* จัดกึ่งกลางปุ่ม */
+    gap: 20px; /* ช่องว่างระหว่างปุ่ม */
+    margin-top: 30px;
+}
+
+.button {
+    background-color: #4CAF50; /* สีเขียวหลัก */
+    color: white;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-weight: 600;
+    min-width: 120px; /* กำหนดความกว้างขั้นต่ำ */
+}
+
+.button:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+.button:active {
+    transform: translateY(0);
+}
+
+.button-secondary {
+    background-color: #6c757d; /* สีเทาสำหรับปุ่มรอง */
+}
+
+.button-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* ข้อความแสดงผล (message) */
+.message {
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 500;
+    text-align: center;
+    display: none; /* ซ่อนไว้ก่อน */
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px;
+        padding: 25px 30px;
+        max-width: 90%; /* ลดความกว้างสูงสุด */
+    }
+
+    .header {
+        font-size: 1.8em;
+        margin-bottom: 25px;
+    }
+
+    .flex.form-input {
+        gap: 8px; /* ลดช่องว่าง */
+    }
+
+    .header-form {
+        font-size: 1em;
+    }
+
+    .form {
+        padding: 10px 12px;
+    }
+
+    .radio-group {
+        flex-direction: column; /* จัด radio เป็นคอลัมน์บนมือถือ */
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .button-group {
+        flex-direction: column; /* ปุ่มเรียงเป็นคอลัมน์บนมือถือ */
+        gap: 15px;
+    }
+
+    .button {
+        width: 100%; /* ปุ่มเต็มความกว้าง */
+        padding: 12px 20px;
+    }
+}
