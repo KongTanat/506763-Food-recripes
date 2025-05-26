@@ -1,213 +1,315 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f7f6;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* จัดชิดด้านบนเพื่อให้มีพื้นที่สำหรับ Scroll */
-    min-height: 100vh;
-    color: #333;
+    background-color: #f8f8f8;
 }
-
-.container {
-    background-color: #ffffff;
-    padding: 30px 40px; /* เพิ่ม padding ด้านข้าง */
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 700px; /* เพิ่มความกว้างสูงสุดสำหรับฟอร์มที่มีหลาย field */
-    margin: 40px auto; /* เพิ่ม margin ด้านบนและล่าง และจัดกึ่งกลาง */
-    box-sizing: border-box;
-}
-
-.header {
-    color: #2c3e50;
-    margin-bottom: 30px;
-    font-size: 2.2em; /* ขนาดตัวอักษรใหญ่ขึ้น */
-    font-weight: 700; /* น้ำหนักตัวอักษรมากขึ้น */
-    text-align: center;
-}
-
-.form-input {
-    margin-bottom: 20px;
-}
-
-.header-form {
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 10px;
-    font-size: 1.1em;
-}
-
-.flex {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* เพิ่มช่องว่างระหว่าง items ใน flexbox */
-}
-
-.flex.form-input {
-    flex-direction: column; /* จัดวางเป็นแนวตั้งสำหรับแต่ละกลุ่ม input */
-    align-items: flex-start; /* ชิดซ้าย */
-}
-
-.form {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1em;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.form:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
-    outline: none;
-}
-
-textarea.form {
-    min-height: 120px; /* กำหนดความสูงขั้นต่ำสำหรับ textarea */
-    resize: vertical; /* อนุญาตให้ปรับขนาดแนวตั้งเท่านั้น */
-}
-
-.radio-group {
-    display: flex;
-    flex-wrap: wrap; /* ให้ radio buttons ขึ้นบรรทัดใหม่ได้ถ้าพื้นที่ไม่พอ */
-    gap: 20px; /* ช่องว่างระหว่าง radio button groups */
-}
-
-.radio-group div {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.radio-group input[type="radio"] {
-    appearance: none; /* ซ่อน radio button default */
-    width: 18px;
-    height: 18px;
-    border: 2px solid #bbb;
-    border-radius: 50%;
-    outline: none;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
-    flex-shrink: 0; /* ป้องกันไม่ให้ radio button หดตัว */
-}
-
-.radio-group input[type="radio"]:checked {
-    background-color: #4CAF50;
-    border-color: #4CAF50;
-    box-shadow: inset 0 0 0 5px #fff; /* จุดวงกลมสีขาวตรงกลาง */
-}
-
-.radio-group label {
-    cursor: pointer;
-    font-size: 1em;
-    color: #333;
-    margin-bottom: 0; /* ลบ margin-bottom จาก label ทั่วไป */
-}
-
-
-/* ปุ่ม */
-.button-group {
-    display: flex;
-    justify-content: center; /* จัดกึ่งกลางปุ่ม */
-    gap: 20px; /* ช่องว่างระหว่างปุ่ม */
-    margin-top: 30px;
-}
-
-.button {
-    background-color: #4CAF50; /* สีเขียวหลัก */
+header {
+    background-color: #ff6600;
     color: white;
-    padding: 14px 30px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1em;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    font-weight: 600;
-    min-width: 120px; /* กำหนดความกว้างขั้นต่ำ */
-}
-
-.button:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
-}
-
-.button:active {
-    transform: translateY(0);
-}
-
-.button-secondary {
-    background-color: #6c757d; /* สีเทาสำหรับปุ่มรอง */
-}
-
-.button-secondary:hover {
-    background-color: #5a6268;
-}
-
-/* ข้อความแสดงผล (message) */
-.message {
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 0.95em;
-    font-weight: 500;
+    padding: 20px;
     text-align: center;
-    display: none; /* ซ่อนไว้ก่อน */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+header h1 {
+    margin-bottom: 10px;
+}
+#login-container {
+    display: flex;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 10;
 }
 
-.message.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+#user-actions-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 10;
 }
 
-.message.danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+#login-container .form-group {
+    margin-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: 10px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .container {
-        margin: 20px;
-        padding: 25px 30px;
-        max-width: 90%; /* ลดความกว้างสูงสุด */
-    }
+#login-container label {
+    margin-right: 5px;
+    color: #333;
+    font-size: 0.9em;
+}
 
-    .header {
-        font-size: 1.8em;
-        margin-bottom: 25px;
-    }
+#login-container input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    width: 100px;
+}
 
-    .flex.form-input {
-        gap: 8px; /* ลดช่องว่าง */
-    }
+#login-container .button-group {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
 
-    .header-form {
-        font-size: 1em;
-    }
+#login-container button {
+    padding: 8px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-right: 5px;
+}
 
-    .form {
-        padding: 10px 12px;
-    }
+#login-container button:hover {
+    background-color: #367c39;
+}
 
-    .radio-group {
-        flex-direction: column; /* จัด radio เป็นคอลัมน์บนมือถือ */
-        align-items: flex-start;
-        gap: 10px;
-    }
+#login-container button#register-button {
+    background-color: #008CBA;
+}
 
-    .button-group {
-        flex-direction: column; /* ปุ่มเรียงเป็นคอลัมน์บนมือถือ */
-        gap: 15px;
-    }
+#login-container button#register-button:hover {
+    background-color: #007ba7;
+}
 
-    .button {
-        width: 100%; /* ปุ่มเต็มความกว้าง */
-        padding: 12px 20px;
-    }
+#user-actions-container .button {
+    padding: 8px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    display: inline-block;
+}
+
+#user-actions-container #logout-button {
+    background-color: #dc3545;
+}
+
+#user-actions-container #logout-button:hover {
+    background-color: #c82333;
+}
+
+#user-actions-container a.button {
+    background-color: #28a745;
+}
+
+#user-actions-container a.button:hover {
+    background-color: #218838;
+}
+
+
+section {
+    padding: 20px;
+    text-align: center;
+}
+#search-section {
+    background-color: #eeeeee;
+}
+.form-group {
+    margin-bottom: 10px;
+    text-align: left;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+.form-group input, .form-group select, .form-group textarea { /* เพิ่ม textarea */
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* สำคัญ: เพื่อให้ padding ไม่ทำให้ width เกิน 100% */
+}
+#search-button {
+    padding: 10px 20px;
+    background-color: #ff6600;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+#home-button {
+    padding: 10px 20px;
+    background-color: blueviolet;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+#search-button:hover {
+    background-color: #cc5200;
+}
+#recipe-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+.recipe-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    width: 300px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex; /* ใช้ flex เพื่อจัดเรียงเนื้อหาภายใน card */
+    flex-direction: column; /* จัดเรียงในแนวตั้ง */
+    justify-content: space-between; /* กระจายเนื้อหาให้เต็มพื้นที่ */
+}
+
+.recipe-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+}
+
+.recipe-card-content {
+    padding: 0 10px;
+    text-align: left;
+    flex-grow: 1; /* ให้ส่วนเนื้อหาขยายเต็มที่ */
+}
+
+.recipe-card h3 {
+    font-size: 1.2em;
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.recipe-card p {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.recipe-card-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 10px;
+    padding: 0 10px; /* เพิ่ม padding ให้ปุ่มด้วย */
+}
+
+.recipe-card-buttons button {
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.85em;
+    border: none;
+    color: white;
+}
+
+.recipe-card-buttons .edit-button {
+    background-color: #007bff;
+}
+
+.recipe-card-buttons .edit-button:hover {
+    background-color: #0056b3;
+}
+
+.recipe-card-buttons .delete-button {
+    background-color: #dc3545;
+}
+
+.recipe-card-buttons .delete-button:hover {
+    background-color: #c82333;
+}
+
+/* --- CSS สำหรับระบบคะแนน (Rating) --- */
+.recipe-card-rating {
+    margin-top: 10px;
+    text-align: left; /* เปลี่ยนเป็น left เพื่อให้สอดคล้องกับเนื้อหาอื่น */
+    font-size: 1.1em;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 10px; /* เพิ่ม padding ให้สอดคล้องกับ content */
+}
+
+.recipe-card-rating .stars {
+    color: gold; /* สีดาว */
+    font-size: 1.2em;
+}
+
+.rating-input {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* จัดเรียงไปทางซ้าย */
+    margin-top: 5px;
+    padding: 0 10px 10px; /* เพิ่ม padding ด้านล่าง */
+}
+
+.rating-input select {
+    width: auto;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    font-size: 0.9em;
+    flex-grow: 0; /* ไม่ให้ขยาย */
+    min-width: 80px; /* กำหนดความกว้างขั้นต่ำ */
+}
+
+.rating-input button {
+    padding: 5px 10px;
+    margin-left: 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.rating-input button:hover {
+    background-color: #0056b3;
+}
+
+/* --- CSS สำหรับข้อความแจ้งเตือน --- */
+#response-message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    /* สีจะถูกกำหนดโดย JavaScript */
+}
+
+
+footer {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    margin-top: 20px;
 }
