@@ -1,3 +1,4 @@
+
 # MenuHit - เว็บไซต์จัดการสูตรอาหารพร้อมระบบให้คะแนน
 
 เว็บไซต์ **MenuHit** เป็นแพลตฟอร์มสำหรับจัดการสูตรอาหารที่ผู้ใช้สามารถเพิ่ม, แก้ไข, ลบสูตรอาหารของตนเองได้ รวมถึงสามารถให้คะแนนสูตรอาหารของผู้อื่นได้ด้วย ระบบมีการจัดการผู้ใช้และการยืนยันตัวตน (Authentication) เพื่อความปลอดภัยของข้อมูล
@@ -33,6 +34,10 @@
     -   ผู้ใช้สามารถให้คะแนนแต่ละเมนูได้เพียง 1 ครั้งเท่านั้น และไม่สามารถแก้ไขคะแนนที่ให้ไปแล้วได้
         
     -   แสดงคะแนนเฉลี่ยของแต่ละสูตรอาหาร
+        
+-   **การแสดงผลเวลาปรุงอาหารที่เป็นมิตรกับผู้ใช้ (User-Friendly Cooking Time Display)**:
+    
+    -   ใช้ฟังก์ชัน `getTimeLabel()` เพื่อแปลงค่าเวลาปรุงอาหารที่เป็นรหัส (เช่น '5-10mins') ให้เป็นข้อความภาษาไทยที่เข้าใจง่าย (เช่น '5-10 นาที') ทำให้ผู้ใช้สามารถอ่านและทำความเข้าใจข้อมูลได้อย่างรวดเร็วและเป็นธรรมชาติ
         
 
 ## เทคโนโลยีที่ใช้ (Technologies Used)
@@ -118,11 +123,11 @@
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
         recipe_id INT NOT NULL,
-        score INT NOT NULL, -- คะแนน (เช่น 1-5)
+        score INT NOT NULL CHECK (score >= 1 AND score <= 5),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE (user_id, recipe_id), -- บังคับให้ user_id และ recipe_id เป็นคู่ที่ไม่ซ้ำกัน (ให้คะแนนได้ 1 ครั้งต่อเมนูต่อผู้ใช้)
         FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-        FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
-        UNIQUE (user_id, recipe_id) -- บังคับให้ user_id และ recipe_id เป็นคู่ที่ไม่ซ้ำกัน (ให้คะแนนได้ 1 ครั้งต่อเมนูต่อผู้ใช้)
+        FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
     );
     
     ```
@@ -147,6 +152,8 @@
         
     -   **คำแนะนำด้านความปลอดภัย**: สำหรับ Production Environment ควรย้าย `JWT_SECRET` ไปเก็บใน Environment Variable และใช้ `bcrypt` ในการ Hash รหัสผ่านผู้ใช้
         
+    -   **ยังไม่ได้ใช้ระบบ Hash Password (เช่น bcrypt)**: ปัจจุบันรหัสผ่านของผู้ใช้ถูกจัดเก็บในฐานข้อมูลเป็นข้อความธรรมดา ซึ่งเป็นความเสี่ยงด้านความปลอดภัยที่สำคัญ **แนะนำอย่างยิ่งให้ใช้ bcrypt หรือไลบรารีการแฮชรหัสผ่านที่เหมาะสม** เพื่อแฮชรหัสผ่านก่อนบันทึกลงฐานข้อมูล
+        
 5.  **รัน Server**: เปิด Terminal ในโฟลเดอร์ Server และรันคำสั่ง:
     
     ```
@@ -165,11 +172,17 @@
     
 3.  **สร้างไฟล์ `main.js`** ภายในโฟลเดอร์ `public` (หรือโฟลเดอร์ย่อยเช่น `public/js`)
     
-4.  **สร้างไฟล์ `ex.js`** (หรือ `utils.js` ตามที่คุณตั้งชื่อ) ภายในโฟลเดอร์ `public` (หรือโฟลเดอร์ย่อยเช่น `public/js`) ซึ่งมีฟังก์ชัน `getTimeLabel`, `getToken`, `getUser`
+4.  **สร้างไฟล์ `utils.js`** ภายในโฟลเดอร์ `public` (หรือโฟลเดอร์ย่อยเช่น `public/js`) ซึ่งมีฟังก์ชัน `getTimeLabel`, `getToken`, `getUser`
     
-5.  **แก้ไข `index.html`**:
+5.  **สร้างไฟล์ `recipe_detail.html`** ภายในโฟลเดอร์ `public` สำหรับหน้ารายละเอียดสูตรอาหาร
     
-    -   ตรวจสอบให้แน่ใจว่าได้ลิงก์ไฟล์ `main.js` และ `ex.js` (หรือ `utils.js`) อย่างถูกต้อง โดยใช้ `type="module"` สำหรับ `main.js` และ path ที่ถูกต้อง
+6.  **สร้างไฟล์ `recipe_detail.js`** ภายในโฟลเดอร์ `public` สำหรับ Logic ของหน้ารายละเอียดสูตรอาหาร
+    
+7.  **สร้างไฟล์ `recipe_detail.css`** ภายในโฟลเดอร์ `public` สำหรับสไตล์ของหน้ารายละเอียดสูตรอาหาร
+    
+8.  **แก้ไข `index.html`**:
+    
+    -   ตรวจสอบให้แน่ใจว่าได้ลิงก์ไฟล์ `main.js` และ `utils.js` อย่างถูกต้อง โดยใช้ `type="module"` สำหรับ `main.js` และ path ที่ถูกต้อง
         
     -   คุณจะต้องเพิ่ม `<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>` ใน `index.html` ก่อนที่จะโหลด `main.js` เพื่อให้ `axios` พร้อมใช้งาน
         
@@ -186,13 +199,14 @@
         <link rel="stylesheet" href="style.css"> </head>
     <body>
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-        <script type="module" src="ex.js"></script> <script type="module" src="main.js"></script>
+        <script type="module" src="utils.js"></script>
+        <script type="module" src="main.js"></script>
     </body>
     </html>
     
     ```
     
-6.  **วางโค้ด Frontend**: คัดลอกโค้ด `main.js` และ `ex.js`  ที่คุณมีไปวางในไฟล์ที่เกี่ยวข้องในโฟลเดอร์ `public`
+9.  **วางโค้ด Frontend**: คัดลอกโค้ด `main.js`, `utils.js`, `recipe_detail.html`, `recipe_detail.js`, และ `recipe_detail.css` ที่คุณมีไปวางในไฟล์ที่เกี่ยวข้องในโฟลเดอร์ `public`
     
 
 ## การใช้งาน (Usage)
@@ -212,6 +226,8 @@
 5.  **เพิ่ม/แก้ไข/ลบสูตรอาหาร**: หลังจาก Login แล้ว คุณจะเห็นตัวเลือกในการจัดการสูตรอาหารของคุณ
     
 6.  **ให้คะแนน**: หลังจาก Login แล้ว คุณจะเห็นตัวเลือกในการให้คะแนนสูตรอาหารของผู้อื่น
+    
+7.  **ดูรายละเอียดสูตรอาหาร**: ผู้ใช้ทั่วไปและสมาชิกสามารถคลิกที่การ์ดสูตรอาหารเพื่อดูรายละเอียดเพิ่มเติมในหน้า `recipe_detail.html`
     
 
 หวังว่า `README.md` นี้จะเป็นประโยชน์กับโปรเจกต์ของคุณนะครับ! หากมีคำถามเพิ่มเติมหรือต้องการปรับปรุงส่วนไหนอีก แจ้งได้เลยครับ
