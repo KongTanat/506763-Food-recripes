@@ -1,163 +1,181 @@
+// add_edit_recipe.js
 
+// Import ฟังก์ชันจาก utils.js
+import { getToken, getUser } from './ex.js';
 
-import { getToken, getUser } from './ex.js'; 
+let responseMessageDOM = null; // Declare it globally or within DOMContentLoaded scope
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Elements จากฟอร์ม
     const recipeForm = document.getElementById('recipe-form');
-    const recipeIdInput = document.getElementById('recipe-id');
+    const recipeIdInput = document.getElementById('recipe-id'); // Hidden input สำหรับเก็บ ID ของสูตรอาหาร (ถ้าเป็นการแก้ไข)
     const recipeNameInput = document.getElementById('recipe-name');
-    const recipeImageInput = document.getElementById('recipe-image');
     const recipeIngredientsInput = document.getElementById('recipe-ingredients');
     const recipeInstructionsInput = document.getElementById('recipe-instructions');
-    const recipeTimeRadios = document.querySelectorAll('input[name="time"]');
-    const recipeDifficultyRadios = document.querySelectorAll('input[name="difficulty"]');
-    const responseMessageDOM = document.getElementById('response-message');
-    const submitButton = document.getElementById('submit-button');
-    const cancelButton = document.getElementById('cancel-button');
-    const formHeader = document.getElementById('form-header');
-    const pageTitle = document.getElementById('page-title');
+    const recipeTimeSelect = document.getElementById('recipe-time');
+    const recipeDifficultySelect = document.getElementById('recipe-difficulty');
+    const recipeImageInput = document.getElementById('recipe-image');
+    const formTitle = document.getElementById('form-title'); // หัวข้อฟอร์ม (เช่น เพิ่มสูตรอาหาร / แก้ไขสูตรอาหาร)
+    const submitButton = document.getElementById('submit-button'); // ปุ่ม Submit
 
-    let mode = 'ADD'; // 'ADD' หรือ 'EDIT'
-    let recipeId = null;
+    responseMessageDOM = document.getElementById('response-message'); // Initialize it here
 
-    const token = getToken();
+    // Function to display messages
+    function showMessage(message, type = 'info') {
+        if (responseMessageDOM) {
+            responseMessageDOM.textContent = message;
+            responseMessageDOM.style.padding = '10px';
+            responseMessageDOM.style.marginBottom = '10px';
+            responseMessageDOM.style.color = 'white';
+            responseMessageDOM.style.fontWeight = 'bold';
+            responseMessageDOM.style.borderRadius = '5px';
+
+            if (type === 'success') {
+                responseMessageDOM.style.backgroundColor = '#28a745'; // Green
+            } else if (type === 'error') {
+                responseMessageDOM.style.backgroundColor = '#dc3545'; // Red
+            } else {
+                responseMessageDOM.style.backgroundColor = '#007bff'; // Blue (info)
+            }
+            responseMessageDOM.style.display = 'block'; // Ensure it's visible
+            setTimeout(() => {
+                responseMessageDOM.textContent = '';
+                responseMessageDOM.style.backgroundColor = 'transparent';
+                responseMessageDOM.style.padding = '0';
+                responseMessageDOM.style.marginBottom = '0';
+                responseMessageDOM.style.display = 'none'; // Hide after some time
+            }, 5000); // Hide after 5 seconds
+        } else {
+            // Fallback to alert if DOM element is not found
+            alert(message);
+        }
+    }
+
+
     const currentUser = getUser();
+    const token = getToken();
 
     // ตรวจสอบสถานะการ Login
-    if (!token || !currentUser || !currentUser.id) {
-        alert('กรุณาเข้าสู่ระบบก่อนดำเนินการ');
-        window.location.href = 'index.html'; // Redirect กลับไปหน้าหลักที่มี Login
+    if (!currentUser || !token) {
+        showMessage('กรุณาเข้าสู่ระบบเพื่อเพิ่มหรือแก้ไขสูตรอาหาร', 'error');
+        setTimeout(() => {
+            window.location.href = 'index.html'; // Redirect กลับไปหน้าหลัก
+        }, 2000); // Give time for message to be seen
         return;
     }
 
-    // ฟังก์ชันสำหรับแสดงข้อความสถานะ
-    function showMessage(message, type = 'info') {
-        responseMessageDOM.textContent = message;
-        responseMessageDOM.className = `message ${type}`;
-        responseMessageDOM.style.display = 'block'; // ให้แน่ใจว่าแสดงผล
-        setTimeout(() => {
-            responseMessageDOM.style.display = 'none'; // ซ่อนหลังจาก 3 วินาที
-        }, 3000);
+    // ตรวจสอบว่าเป็นการแก้ไขหรือเพิ่มสูตรอาหารใหม่
+    const urlParams = new URLSearchParams(window.location.search);
+    const recipeId = urlParams.get('id');
+
+    if (recipeId) {
+        // ถ้ามี ID ใน URL แสดงว่าเป็นการแก้ไขสูตรอาหาร
+        formTitle.textContent = 'แก้ไขสูตรอาหาร';
+        submitButton.textContent = 'บันทึกการแก้ไข';
+        recipeIdInput.value = recipeId;
+        await fetchRecipeForEdit(recipeId, token);
+    } else {
+        // ถ้าไม่มี ID แสดงว่าเป็นการเพิ่มสูตรอาหารใหม่
+        formTitle.textContent = 'เพิ่มสูตรอาหารใหม่';
+        submitButton.textContent = 'เพิ่มสูตรอาหาร';
     }
 
-    // โหลดข้อมูลสูตรอาหารหากอยู่ในโหมดแก้ไข
-    const urlParams = new URLSearchParams(window.location.search);
-    const idFromUrl = urlParams.get('id');
-
-    if (idFromUrl) {
-        mode = 'EDIT';
-        recipeId = idFromUrl;
-        formHeader.textContent = 'แก้ไขสูตรอาหาร';
-        pageTitle.textContent = 'แก้ไขสูตรอาหาร';
-        submitButton.textContent = 'บันทึกการแก้ไข';
-
+    // ฟังก์ชันสำหรับดึงข้อมูลสูตรอาหารเพื่อแก้ไข
+    async function fetchRecipeForEdit(id, token) {
         try {
-            const response = await axios.get(`http://localhost:8000/recipes/${recipeId}`);
-            const recipeData = response.data;
+            const response = await axios.get(`http://localhost:8000/recipes/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const recipe = response.data;
 
-            // ตรวจสอบว่าเป็นเจ้าของสูตรหรือไม่
-            if (recipeData.user_id !== currentUser.id) {
-                alert('คุณไม่มีสิทธิ์แก้ไขสูตรอาหารนี้');
-                window.location.href = 'index.html';
+            // ตรวจสอบสิทธิ์การแก้ไข (เฉพาะเจ้าของสูตร)
+            if (recipe.user_id !== currentUser.id) {
+                showMessage('คุณไม่ได้รับอนุญาตให้แก้ไขสูตรอาหารนี้', 'error');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
                 return;
             }
 
-            // Populate form fields
-            recipeIdInput.value = recipeData.id;
-            recipeNameInput.value = recipeData.name;
-            recipeImageInput.value = recipeData.image_food || recipeData.image; // ใช้ image_food หรือ image
-            recipeIngredientsInput.value = recipeData.ingredients;
-            recipeInstructionsInput.value = recipeData.instructions;
-
-            // เลือก radio button สำหรับเวลา
-            recipeTimeRadios.forEach(radio => {
-                if (radio.value === recipeData.time) {
-                    radio.checked = true;
-                }
-            });
-
-            // เลือก radio button สำหรับความยาก
-            recipeDifficultyRadios.forEach(radio => {
-                if (radio.value === recipeData.difficulty) {
-                    radio.checked = true;
-                }
-            });
+            // เติมข้อมูลลงในฟอร์ม
+            recipeNameInput.value = recipe.name;
+            recipeIngredientsInput.value = recipe.ingredients;
+            recipeInstructionsInput.value = recipe.instructions;
+            recipeTimeSelect.value = recipe.time;
+            recipeDifficultySelect.value = recipe.difficulty;
+            recipeImageInput.value = recipe.image_food || recipe.image; // ใช้ image_food หรือ image ตามคอลัมน์ใน DB
 
         } catch (error) {
             console.error('Error fetching recipe for edit:', error.response ? error.response.data : error.message);
-            showMessage('ไม่สามารถโหลดข้อมูลสูตรอาหารเพื่อแก้ไขได้', 'danger');
-            // ถ้าเกิด error ในการโหลดข้อมูล อาจจะ redirect กลับไปหน้าหลัก
-            // window.location.href = 'index.html';
+            showMessage('ไม่สามารถดึงข้อมูลสูตรอาหารเพื่อแก้ไขได้', 'error');
+            setTimeout(() => {
+                window.location.href = 'index.html'; // Redirect กลับหน้าหลักหากเกิดข้อผิดพลาด
+            }, 2000);
         }
     }
 
-    // Event Listener สำหรับการส่งฟอร์ม (Add/Edit)
+    // Event Listener สำหรับการ Submit ฟอร์ม
     recipeForm.addEventListener('submit', async (event) => {
         event.preventDefault(); // ป้องกันการ reload หน้า
 
-        const recipeData = {
-            name: recipeNameInput.value,
-            image_food: recipeImageInput.value,
-            ingredients: recipeIngredientsInput.value,
-            instructions: recipeInstructionsInput.value,
-            time: document.querySelector('input[name="time"]:checked')?.value || '', // ใช้ optional chaining
-            difficulty: document.querySelector('input[name="difficulty"]:checked')?.value || ''
-        };
-
-        // ตรวจสอบข้อมูลเบื้องต้นก่อนส่ง (Client-side validation)
-        if (!recipeData.name || !recipeData.image_food || !recipeData.ingredients || !recipeData.instructions || !recipeData.time || !recipeData.difficulty) {
-            showMessage('กรุณากรอกข้อมูลให้ครบถ้วน', 'danger');
-            return;
+        // --- เพิ่มการตรวจสอบข้อมูลที่นี่ ---
+        if (!recipeNameInput.value.trim() ||
+            !recipeIngredientsInput.value.trim() ||
+            !recipeInstructionsInput.value.trim() ||
+            !recipeTimeSelect.value ||
+            !recipeDifficultySelect.value) {
+            showMessage('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน', 'error'); // ข้อความแจ้งเตือน
+            return; // หยุดการทำงานถ้าข้อมูลไม่ครบ
         }
+        // --- สิ้นสุดการตรวจสอบข้อมูล ---
+
+        const recipeData = {
+            name: recipeNameInput.value.trim(),
+            ingredients: recipeIngredientsInput.value.trim(),
+            instructions: recipeInstructionsInput.value.trim(),
+            time: recipeTimeSelect.value,
+            difficulty: recipeDifficultySelect.value,
+            image_food: recipeImageInput.value.trim(), // image_food ไม่ได้ required
+        };
 
         try {
             let response;
-            if (mode === 'ADD') {
-                response = await axios.post('http://localhost:8000/recipes', recipeData, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                showMessage('เพิ่มสูตรอาหารเรียบร้อยแล้ว!', 'success');
-            } else { // mode === 'EDIT'
+            if (recipeId) {
+                // ถ้ามี recipeId คือการแก้ไข (PUT)
                 response = await axios.put(`http://localhost:8000/recipes/${recipeId}`, recipeData, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                showMessage('บันทึกการแก้ไขสูตรอาหารเรียบร้อยแล้ว!', 'success');
+                showMessage('บันทึกการแก้ไขสูตรอาหารสำเร็จ!', 'success');
+            } else {
+                // ถ้าไม่มี recipeId คือการเพิ่มใหม่ (POST)
+                response = await axios.post('http://localhost:8000/recipes', recipeData, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                showMessage('เพิ่มสูตรอาหารใหม่สำเร็จ!', 'success');
             }
-
-            console.log('Response:', response.data);
             setTimeout(() => {
-                window.location.href = 'index.html'; // กลับไปหน้าหลักหลังจากสำเร็จ
-            }, 1500); // หน่วงเวลาเล็กน้อยเพื่อให้เห็นข้อความ
-            
+                window.location.href = 'index.html'; // กลับไปหน้าหลักเมื่อสำเร็จ
+            }, 2000); // Give time for message to be seen
         } catch (error) {
-            console.error('Error submitting recipe:', error.response ? error.response.data : error.message);
-            let errorMessage = 'เกิดข้อผิดพลาดในการดำเนินการ';
-            if (error.response && error.response.data && error.response.data.error) {
-                errorMessage = error.response.data.error;
-            } else if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            }
-
+            console.error('Error saving recipe:', error.response ? error.response.data : error.message);
             if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-                errorMessage = 'คุณไม่มีสิทธิ์ดำเนินการนี้ หรือเซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่';
+                showMessage('คุณไม่ได้รับอนุญาตให้ดำเนินการ (เซสชันหมดอายุหรือไม่ใช่เจ้าของสูตร) กรุณาเข้าสู่ระบบใหม่', 'error');
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 setTimeout(() => {
                     window.location.href = 'index.html';
-                }, 1500);
+                }, 2000);
+            } else {
+                showMessage('เกิดข้อผิดพลาดในการบันทึกสูตรอาหาร: ' + (error.response ? error.response.data.error || error.response.data.message : error.message), 'error');
             }
-            showMessage(errorMessage, 'danger');
         }
-    });
-
-    // Event Listener สำหรับปุ่มยกเลิก
-    cancelButton.addEventListener('click', () => {
-        window.location.href = 'index.html'; // กลับไปหน้าหลัก
     });
 });
