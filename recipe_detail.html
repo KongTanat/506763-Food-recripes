@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายละเอียดสูตรอาหาร</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>รายละเอียดสูตรอาหาร</h1>
+        <div id="user-actions-container">
+            <a href="index.html" class="button" id="home-button">กลับหน้าหลัก</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="recipe-detail-section">
+            <div id="recipe-detail-container">
+                <p>กำลังโหลดรายละเอียด...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 เว็บไซต์รวบรวมสูตรอาหาร</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module" src="ex.js"></script>
+    <script type="module" src="recipe_detail.js"></script>
+</body>
+</html>
