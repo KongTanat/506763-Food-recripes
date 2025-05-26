@@ -316,7 +316,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 buttonGroup.appendChild(deleteButton);
                 content.appendChild(buttonGroup);
             }
-
+ // เพิ่ม Event Listener ให้กับการ์ดทั้งหมด
+            recipeCard.addEventListener('click', () => {
+            window.location.href = `recipe_detail.html?id=${recipe.id}`;
+                });
             recipeCard.appendChild(image);
             recipeCard.appendChild(content);
             recipeListContainer.appendChild(recipeCard);
