@@ -1,5 +1,5 @@
 // public/recipe_detail.js
-import { getTimeLabel } from './utils.js'; // ดึงฟังก์ชัน getTimeLabel มาใช้
+import { getTimeLabel } from './ex.js'; // ดึงฟังก์ชัน getTimeLabel มาใช้
 
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
